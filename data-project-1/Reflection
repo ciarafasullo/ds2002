@@ -1,0 +1,17 @@
+Ciara Fasullo
+evz5pv@virginia.edu
+October 20, 2024
+Project 1 Reflection
+
+	This project was a valuable learning experience that came with some ease and some challenges. It gave me an opportunity to enhance my technical skills, with the added complexity of finding a real-world data source to pull from.
+
+	One of the main challenges I faced was the initial data preparation and cleaning process. The ‘style’ column in the dataset contained a number of highly specific categories, many of which seemed redundant and made data visualization less effective. Deciding how to group these home styles into broader categories required careful consideration to ensure that the visualizations were readable without losing important insights.
+
+	Another challenge came with creating the visualization I incorporated into my code. The outputs weren’t rendering as I expected, which caused me to reconsider and simplify my approach by going with a simpler matplotlib plot instead of something more interactive using Plotly. Further, ensuring that the graphs were not only functional but readable was a challenge in itself. Adjusting label rotation, grid lines, and color schemes was a bit more tedious than I expected, but the result was a more aesthetically-pleasing graph.
+		Despite the challenges, some parts of the project ended up being easier than anticipated. An aspect of coding the ETL processor that came together relatively easily was the implementation of data extraction and loading. Given the complex nature of datasets, I expected to encounter more issues reading the data into Python, but the process turned out to be quite smooth using Colab. Leveraging pandas to load the dataset was straightforward. Further, the flexibility of the library made the technical aspect of the cleaning process a bit more intuitive.
+
+	Another part of the ETL processor that was easier than expected was maintaining a clean separation of concerns between extraction, transformation, and loading stages. Python’s structure allowed me to modularize each part of the ETL process while writing, making it easier to debug and maintain.
+This project illustrated how valuable a well-constructed ETL processor can be for other data projects. Many real-world datasets are messy or incomplete, and the ability to design a data processor that can extract, transform, and load data efficiently is critical for making sense of it. A utility like this can be applied in many fields of data science, such as financial analysis, where ETL pipelines could be used to extract data, transform it by categorizing or calculating key metrics, and loading it into visual dashboards for decision-making.
+  
+  Further, the reusability of the ETL framework makes it a useful tool for future data projects. Since the foundation of the ETL pipeline will remain relatively similar across projects, creating this processor ensures that future datasets can be quickly analyzed without having to start from scratch each time.
+
