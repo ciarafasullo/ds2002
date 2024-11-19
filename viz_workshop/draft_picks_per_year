@@ -1,0 +1,101 @@
+import pandas as pd
+import os
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Set the path to the file on your desktop
+file_path = os.path.expanduser("~/Desktop/all_seasons.csv")
+
+# Load the dataset
+df = pd.read_csv(file_path)
+
+# Filter out rows where the college, draft_year, or draft_round is missing
+df = df.dropna(subset=["college", "draft_year", "draft_round"])
+
+# Remove rows where draft_year or draft_round contains "Undrafted"
+df = df[~df["draft_year"].str.contains("Undrafted", na=False)]
+df = df[~df["draft_round"].str.contains("Undrafted", na=False)]
+
+# Convert draft_round to integer for easier handling
+df["draft_round"] = pd.to_numeric(df["draft_round"], errors="coerce").dropna().astype(int)
+
+# Group the data by college to calculate the average draft round
+average_draft_round = (
+    df.groupby("college")["draft_round"]
+    .mean()
+    .reset_index()
+    .rename(columns={"draft_round": "average_draft_round"})
+)
+
+# Define bins and labels
+bins = [1, 1.5, 2, 2.5, 3, 3.5, 4, average_draft_round["average_draft_round"].max() + 1]
+labels = ["1-1.5", "1.5-2", "2-2.5", "2.5-3", "3-3.5", "3.5-4", "4+"]
+
+# Bin colleges into categories based on their average draft round
+average_draft_round["draft_round_bin"] = pd.cut(
+    average_draft_round["average_draft_round"], bins=bins, labels=labels, right=False
+)
+
+# Count the number of colleges in each bin
+bin_counts = average_draft_round["draft_round_bin"].value_counts().sort_index()
+
+# Prepare a dictionary of colleges in each bin for hover
+bin_colleges = (
+    average_draft_round.groupby("draft_round_bin")["college"]
+    .apply(lambda x: ", ".join(x))
+    .reindex(labels)
+)
+
+# Plot the data using Seaborn
+fig, ax = plt.subplots(figsize=(10, 6))
+bars = sns.barplot(
+    x=bin_counts.index,
+    y=bin_counts.values,
+    palette="viridis",
+    ax=ax,
+)
+
+# Add labels and title
+ax.set_xlabel("Average Draft Round Range")
+ax.set_ylabel("Number of Colleges")
+ax.set_title("Distribution of Colleges by Average Draft Round in the NBA Draft")
+plt.tight_layout()
+
+# Add hover functionality
+annot = ax.annotate(
+    "",
+    xy=(0, 0),
+    xytext=(20, 20),
+    textcoords="offset points",
+    bbox=dict(boxstyle="round", fc="w"),
+    arrowprops=dict(arrowstyle="->"),
+    fontsize=10,
+    wrap=True,
+)
+annot.set_visible(False)
+
+# Function to update hover annotation
+def update_annot(bar, text):
+    annot.xy = (bar.get_x() + bar.get_width() / 2, bar.get_height())
+    annot.set_text(text)
+    annot.get_bbox_patch().set_alpha(0.9)
+
+# Event handler for hovering
+def on_hover(event):
+    vis = annot.get_visible()
+    for bar, bin_label in zip(bars.patches, labels):
+        if bar.contains(event)[0]:
+            text = f"Colleges:\n{bin_colleges[bin_label]}"
+            update_annot(bar, text)
+            annot.set_visible(True)
+            fig.canvas.draw_idle()
+            return
+    if vis:
+        annot.set_visible(False)
+        fig.canvas.draw_idle()
+
+# Ensure interactivity is enabled
+fig.canvas.mpl_connect("motion_notify_event", on_hover)
+
+# Show the plot
+plt.show()
